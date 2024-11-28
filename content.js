@@ -27,7 +27,7 @@ function fetchData(csvUrl) {
       return parsedData;
     })
     .catch((error) => {
-      console.error("Error fetching csv for u9:", error);
+      console.error(`Error fetching csv for ${csvUrl}:`, error);
     });
 }
 
@@ -40,7 +40,7 @@ function createCell(text, row) {
 function whichAge() {
   const documentText = document.getElementById("content").textContent;
   const words = documentText.split(/\s+/);
-  return [words.includes("9U"), words.includes("10U"), words.includes("11U")];
+  return [words.includes("9U"), words.includes("10U"), words.includes("11U") || words.includes("12U")];
 }
 
 (async () => {
@@ -65,8 +65,7 @@ function whichAge() {
     const playerCell = row.querySelector(`td:nth-child(${playerCellIndex})`);
 
     if (playerCell) {
-      const player = players.find((item) => item.player == playerCell.innerText);
-      console.log(player, playerCell)
+      const player = players.find((item) => item.player?.toLowerCase() == playerCell.innerText?.toLowerCase());
       createCell(player ? player?.form : "0", row);
       createCell(player ? player?.county : "", row);
     }
