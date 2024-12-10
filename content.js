@@ -32,24 +32,28 @@ function fetchData(csvUrl) {
 }
 
 function createCell(text, row) {
-    const ratingCell = document.createElement("td");
-    ratingCell.innerText = text;
-    row.appendChild(ratingCell);
+  const ratingCell = document.createElement("td");
+  ratingCell.innerText = text;
+  row.appendChild(ratingCell);
 }
 
 function whichAge() {
   const documentText = document.getElementById("content").textContent;
   const words = documentText.split(/\s+/);
-  return [words.includes("9U"), words.includes("10U"), words.includes("11U") || words.includes("12U")];
+  return [
+    words.includes("9U"),
+    words.includes("10U"),
+    words.includes("11U") || words.includes("12U") || words.includes("14U"),
+  ];
 }
 
 (async () => {
   const table = document.querySelector("table.ruler > tbody");
   const rows = table.querySelectorAll("tr");
 
-  const [isu9, isu10, isu11] = whichAge();
+  const [isu9, isu10, isCombined] = whichAge();
 
-  if (!isu9 && !isu10 && !isu11) return;
+  if (!isu9 && !isu10 && !isCombined) return;
 
   const dataurl = isu9
     ? "https://ltascrape.blob.core.windows.net/files/u9.csv?sp=r&st=2023-09-19T07:21:48Z&se=2025-09-01T15:21:48Z&spr=https&sv=2022-11-02&sr=b&sig=z3nG7dlwk2upIbaIe1TxpHeP86tIFiSxA2jcHz%2BcU%2F8%3D"
@@ -59,13 +63,25 @@ function whichAge() {
 
   const players = await fetchData(dataurl);
 
-  const playerCellIndex = table.querySelector("td.elt1") ? 2 : 1;
+  const playerCellIndex = Array.from(
+    document.querySelectorAll("table.ruler > thead td")
+  ).findIndex((header) => ["Player", "Name"].includes(header.innerText.trim())) + 1;
+
+  if (playerCellIndex === 0) {
+    console.log("No player header found");
+    return;
+  }
 
   rows.forEach((row) => {
-    const playerCell = row.querySelector(`td:nth-child(${playerCellIndex})`);
+    const playerCell = row.querySelector(
+      `td:nth-child(${playerCellIndex})`
+    );
 
     if (playerCell) {
-      const player = players.find((item) => item.player?.toLowerCase() == playerCell.innerText?.toLowerCase());
+      const player = players.find(
+        (item) =>
+          item.player?.toLowerCase() == playerCell.innerText?.toLowerCase()
+      );
       createCell(player ? player?.form : "0", row);
       createCell(player ? player?.county : "", row);
     }
@@ -77,8 +93,8 @@ function whichAge() {
   unsortedRows.sort((a, b) => {
     let cellA, cellB;
     try {
-      cellA = parseFloat(a.cells[playerCellIndex*2].innerText);
-      cellB = parseFloat(b.cells[playerCellIndex*2].innerText);
+      cellA = parseFloat(a.cells[playerCellIndex * 2].innerText);
+      cellB = parseFloat(b.cells[playerCellIndex * 2].innerText);
     } catch {
       return -99;
     }
