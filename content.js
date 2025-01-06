@@ -85,6 +85,7 @@ function whichAge() {
       createCell(player ? player?.form : "0", row);
       createCell(player ? player?.county : "", row);
       createCell(player ? player?.year : "", row);
+      createCell(player ? player?.wtnsingles : "", row);
     }
   });
 

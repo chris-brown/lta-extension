@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "LTA ranking extension",
   "description": "Adds ranking points to the entries page",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "icons": {
     "16": "images/icon-16.png",
     "128": "images/icon-128.png"
